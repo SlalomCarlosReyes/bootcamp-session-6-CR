@@ -42,14 +42,14 @@
 
 ### Requirement Completeness Assessment ✅
 
-- **No clarification markers**: ✅ All requirements are fully specified with reasonable defaults documented in Assumptions
-- **Testable requirements**: ✅ Each FR has clear pass/fail criteria (e.g., FR-001 can be tested by comparing dates, FR-002 by verifying styling)
-- **Measurable success criteria**: ✅ All SC items have quantifiable metrics (2 seconds, 100%, 0%, visual distinction)
+- **No clarification markers**: ✅ All requirements are fully specified with reasonable defaults documented in Assumptions (5 clarifications resolved during /speckit.clarify session)
+- **Testable requirements**: ✅ Each FR has clear pass/fail criteria (10 FRs total including accessibility and invalid date handling)
+- **Measurable success criteria**: ✅ All SC items have quantifiable metrics (6 success criteria including screen reader accessibility)
 - **Technology-agnostic**: ✅ Success criteria focus on user outcomes (identification time, visual distinction) not implementation details
-- **Acceptance scenarios**: ✅ 9 comprehensive scenarios covering incomplete/complete todos, various due dates, and edge cases
-- **Edge cases**: ✅ 5 edge cases identified including date changes, system time issues, and very old items
+- **Acceptance scenarios**: ✅ 12 comprehensive scenarios covering incomplete/complete todos, various due dates, hover/focus states, and relative time formats
+- **Edge cases**: ✅ 6 edge cases identified including date changes, system time issues, invalid dates, and very old items
 - **Scope boundaries**: ✅ Clear scope (main todo list view only, no real-time updates, no schema changes)
-- **Dependencies**: ✅ Assumptions document reliance on existing UI guidelines, dueDate field, and browser date/time
+- **Dependencies**: ✅ Assumptions document reliance on existing UI guidelines, dueDate field, browser date/time, and graceful degradation
 
 ### Feature Readiness Assessment ✅
 
@@ -60,12 +60,27 @@
 
 ## Notes
 
-✅ **CHECKLIST COMPLETE** - All quality criteria met. Specification is ready for `/speckit.clarify` (if needed) or `/speckit.plan`.
+✅ **CHECKLIST COMPLETE** - All quality criteria met. Specification clarified and ready for `/speckit.plan`.
+
+**Clarification Session (2026-06-10)**:
+- 5 questions asked and resolved
+- Clarifications covered: accessibility support, relative time format, visual styling interactions, performance approach, invalid date handling
+- Result: Enhanced spec with clearer implementation guidance while maintaining simplicity
+
+**Before Clarification**: 12/16 → **After Clarification**: 16/16 items passing
+
+**Newly passing items**:
+- Accessibility: Added ARIA label requirement (FR-009, SC-006)
+- Date formats: Specified relative time grouping rules (yesterday, days, weeks, months)
+- UI interactions: Clarified hover/focus behavior with overdue styling
+- Performance: Defined simple render-time calculation approach
+- Error handling: Specified graceful degradation for invalid dates (FR-010)
 
 **Strengths**:
 - Excellent prioritization with P1 (visual styling) as true MVP and P2 (relative dates) as enhancement
-- Comprehensive edge case coverage including date transitions and completed todo handling
-- Clear assumptions about date handling (local time, no real-time updates) prevent scope creep
+- Comprehensive edge case coverage including date transitions, completed todo handling, and invalid dates
+- Clear assumptions about date handling (local time, no real-time updates, graceful degradation) prevent scope creep
 - Success criteria focus on user experience (2-second identification) rather than technical metrics
+- Accessibility considerations (ARIA labels) ensure inclusive design
 
-**Ready for next phase**: Specification has no blockers and can proceed directly to planning.
+**Ready for next phase**: Specification has no blockers and can proceed directly to `/speckit.plan`.

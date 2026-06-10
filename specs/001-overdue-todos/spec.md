@@ -8,6 +8,16 @@
 
 **Input**: User description: "Users need a clear, visual way to identify which todos have not been completed by their due date. This helps users quickly spot overdue items without having to manually check dates against today's date."
 
+## Clarifications
+
+### Session 2026-06-10
+
+- Q: Should the feature include accessibility support for users with visual impairments or screen reader users? → A: Basic ARIA labels only (e.g., aria-label="Overdue: Task title")
+- Q: What format should be used for relative time displays (e.g., "Due 3 days ago") and when should it transition between time units? → A: Standard relative format with weekly grouping (e.g., "yesterday", "2 days ago", "1 week ago", "3 months ago")
+- Q: How should overdue styling interact with other UI states like hover, focus, or selection? → A: Overdue styling as base layer (red text/border remains, standard hover/focus effects apply on top)
+- Q: When should date comparisons be performed to determine overdue status, and should results be cached? → A: Calculate on each render (simple, always correct, negligible performance impact for typical todo counts)
+- Q: What should happen if a todo has an invalid or malformed date value? → A: Treat as no due date (invalid/null dates display with normal styling, no overdue indication)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Visual Identification of Overdue Todos (Priority: P1)
@@ -25,6 +35,7 @@ Users with incomplete todos that have passed their due date need immediate visua
 3. **Given** a todo item with a due date in the future and completion status is incomplete, **When** the user views the todo list, **Then** the todo item is displayed with normal styling (not marked as overdue)
 4. **Given** a todo item with a due date in the past but completion status is complete, **When** the user views the todo list, **Then** the todo item is displayed with success styling (green) and not marked as overdue
 5. **Given** a todo item with no due date, **When** the user views the todo list, **Then** the todo item is displayed with normal styling (no overdue indication)
+6. **Given** an overdue todo item, **When** the user hovers over or focuses on the item, **Then** the danger color styling remains visible with standard hover/focus effects applied on top
 
 ---
 
@@ -38,10 +49,12 @@ Users viewing their todo list need to quickly understand not just that a todo is
 
 **Acceptance Scenarios**:
 
-1. **Given** a todo with a due date 1 day in the past, **When** the user views the todo list, **Then** the due date displays as "Due 1 day ago" or "Due yesterday"
+1. **Given** a todo with a due date 1 day in the past, **When** the user views the todo list, **Then** the due date displays as "Due yesterday"
 2. **Given** a todo with a due date 5 days in the past, **When** the user views the todo list, **Then** the due date displays as "Due 5 days ago"
-3. **Given** a todo with a due date in the future, **When** the user views the todo list, **Then** the due date displays as "Due in 3 days" or the actual date
-4. **Given** a completed todo that was overdue, **When** the user views the todo list, **Then** the due date displays normally without "X days ago" text
+3. **Given** a todo with a due date 14 days in the past, **When** the user views the todo list, **Then** the due date displays as "Due 2 weeks ago"
+4. **Given** a todo with a due date 90 days in the past, **When** the user views the todo list, **Then** the due date displays as "Due 3 months ago"
+5. **Given** a todo with a due date in the future, **When** the user views the todo list, **Then** the due date displays as "Due in 3 days" or the actual date
+6. **Given** a completed todo that was overdue, **When** the user views the todo list, **Then** the due date displays normally without relative time text
 
 ---
 
@@ -57,6 +70,8 @@ Users viewing their todo list need to quickly understand not just that a todo is
   - Completed todos use success styling (green) regardless of due date; overdue styling only applies to incomplete todos
 - What happens with todos that have due dates far in the past (e.g., years ago)?
   - Display relative time up to a reasonable limit (e.g., "Due 365+ days ago"), or show the actual date for very old items
+- What happens if a todo has an invalid or malformed date value?
+  - System treats invalid or null dates as "no due date" and displays the todo with normal styling (no overdue indication); no error message shown to user
 
 ## Requirements *(mandatory)*
 
@@ -70,6 +85,8 @@ Users viewing their todo list need to quickly understand not just that a todo is
 - **FR-006**: System MUST display relative time information (e.g., "Due 3 days ago") for overdue incomplete todos to provide urgency context
 - **FR-007**: System MUST use the user's local system date/time for overdue calculations to match user expectations
 - **FR-008**: System MUST maintain existing todo list functionality (viewing, editing, deleting, completing) while adding overdue indicators
+- **FR-009**: System MUST provide ARIA labels for overdue todos to ensure screen reader accessibility (e.g., aria-label="Overdue: [Task title]")
+- **FR-010**: System MUST treat invalid or malformed due date values as "no due date" and display with normal styling (graceful degradation)
 
 ### Key Entities
 
@@ -84,13 +101,18 @@ Users viewing their todo list need to quickly understand not just that a todo is
 - **SC-003**: 0% of todos without due dates or with future due dates are incorrectly marked as overdue
 - **SC-004**: Users can distinguish between overdue incomplete todos and completed todos through visual styling alone
 - **SC-005**: The todo list displays and responds to user interactions at the same speed as before (no performance degradation)
+- **SC-006**: Screen reader users can identify overdue todos through ARIA labels without relying on visual cues
 
 ## Assumptions
 
 - Visual styling follows existing UI guidelines for danger colors (red in light mode `#c62828`, light red in dark mode `#ef5350`)
+- Overdue styling serves as the base layer; standard hover, focus, and selection effects are applied on top without suppressing the danger color
 - Date comparison uses browser's local date/time; no timezone conversion or server-side date handling required
+- Overdue status is calculated on each component render for simplicity and correctness; no caching or memoization required for typical todo list sizes
 - Overdue status updates on page load/component render; real-time automatic updates (e.g., at midnight) are not required
 - The existing todo data model already includes a `dueDate` field; no database schema changes needed
 - Users understand relative time formats (e.g., "3 days ago") as standard web conventions
+- Relative time format follows standard grouping: "yesterday" for 1 day, "X days ago" for 2-6 days, "X weeks ago" for 7-27 days, "X months ago" for 28+ days
+- Invalid or malformed date values are treated as "no due date" for graceful degradation; no validation errors displayed to users
 - The feature applies only to the main todo list view; other potential views (filters, searches) are out of scope
 - Completed todos always use success styling (green) per existing UI guidelines, regardless of when they were completed relative to due date
