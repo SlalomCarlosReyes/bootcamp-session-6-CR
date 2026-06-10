@@ -132,15 +132,17 @@ jobs:
 
       - name: Create comment - add step content
         run: |
+          STEP_CONTENT=$(cat ".github/steps/6-2-establish-constitution.md")
           gh issue comment "$ISSUE_URL" \
-            --body-file ".github/steps/6-2-establish-constitution.md"
+            --body "$STEP_CONTENT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create comment - watching for progress
         run: |
+          WATCHING_CONTENT=$(cat exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md)
           gh issue comment "$ISSUE_URL" \
-            --body-file exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+            --body "$WATCHING_CONTENT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
