@@ -48,7 +48,15 @@ jobs:
         id: check_clarifications
         continue-on-error: true
         run: |
-          if ! grep -q "Clarifications" specs/001-*/spec.md; then
+          shopt -s nullglob
+          spec_files=(specs/001-*/spec.md .specify/specs/001-*/spec.md)
+
+          if [ ${#spec_files[@]} -eq 0 ]; then
+            echo "spec.md file not found in specs/001-*/ or .specify/specs/001-*/ directory!"
+            exit 1
+          fi
+
+          if ! grep -q "Clarifications" "${spec_files[0]}"; then
             echo "Clarifications section not found in spec.md!"
             exit 1
           fi
@@ -64,7 +72,7 @@ jobs:
             results_table:
               - description: "The specification should contain a 'Clarifications' section"
                 passed: ${{ steps.check_clarifications.outcome == 'success' }}
-                error_message: "The 'Clarifications' section was not found in specs/001-*/spec.md. Make sure you ran the /speckit.clarify command in the same chat and answered the clarifying questions."
+                error_message: "The 'Clarifications' section was not found in specs/001-*/spec.md (or .specify/specs/001-*/spec.md). Make sure you ran the /speckit.clarify command in the same chat and answered the clarifying questions."
 
       - name: Create comment - step results
         run: |
