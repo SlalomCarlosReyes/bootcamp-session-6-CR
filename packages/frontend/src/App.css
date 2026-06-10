@@ -328,6 +328,32 @@ p {
   background-color: var(--bg-primary);
 }
 
+/* Overdue styling (T021) */
+.todo-card--overdue {
+  border-color: var(--danger-color);
+  border-width: 2px;
+}
+
+.todo-card--overdue .todo-title {
+  color: var(--danger-color);
+}
+
+.todo-card--overdue .todo-due-date {
+  color: var(--danger-color);
+  font-weight: 600;
+}
+
+/* Preserve overdue styling on hover/focus (T022) */
+.todo-card--overdue:hover {
+  box-shadow: var(--shadow-md);
+  background-color: var(--bg-primary);
+  border-color: var(--danger-color);
+}
+
+.todo-card--overdue:focus-within {
+  border-color: var(--danger-color);
+}
+
 .todo-card.completed .todo-title {
   text-decoration: line-through;
   opacity: 0.6;

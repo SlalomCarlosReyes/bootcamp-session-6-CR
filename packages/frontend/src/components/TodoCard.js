@@ -1,5 +1,24 @@
 import React, { useState } from 'react';
+import { isOverdue, getRelativeTimeText } from '../utils/dateUtils';
 
+/**
+ * TodoCard Component
+ * 
+ * Displays an individual todo item with support for overdue indication.
+ * 
+ * Overdue functionality:
+ * - Incomplete todos with past due dates display with danger color styling
+ * - Overdue incomplete todos show relative time ("3 days ago", "yesterday")
+ * - Completed todos never show overdue styling (display success color)
+ * - ARIA labels added for screen reader accessibility ("Overdue: Task title")
+ * 
+ * @param {Object} props
+ * @param {Object} props.todo - Todo object with { id, title, dueDate, completed }
+ * @param {Function} props.onToggle - Handler for checkbox toggle
+ * @param {Function} props.onEdit - Handler for editing todo
+ * @param {Function} props.onDelete - Handler for deleting todo
+ * @param {boolean} props.isLoading - Loading state
+ */
 function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(todo.title);
@@ -106,8 +125,20 @@ function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
     );
   }
 
+  // Compute if todo is overdue (T018)
+  const todoIsOverdue = isOverdue(todo);
+
+  // Get relative time text for overdue incomplete todos (T036)
+  const relativeTime = todoIsOverdue && !todo.completed ? getRelativeTimeText(todo.dueDate) : '';
+
+  // Construct ARIA label for accessibility (T020)
+  const ariaLabel = todoIsOverdue ? `Overdue: ${todo.title}` : undefined;
+
   return (
-    <div className={`todo-card ${todo.completed ? 'completed' : ''}`}>
+    <div 
+      className={`todo-card ${todo.completed ? 'completed' : ''} ${todoIsOverdue ? 'todo-card--overdue' : ''}`}
+      aria-label={ariaLabel}
+    >
       <input
         type="checkbox"
         checked={todo.completed === 1}
@@ -121,7 +152,7 @@ function TodoCard({ todo, onToggle, onEdit, onDelete, isLoading }) {
         <h3 className="todo-title">{todo.title}</h3>
         {todo.dueDate && (
           <p className="todo-due-date">
-            Due: {formatDate(todo.dueDate)}
+            Due: {relativeTime || formatDate(todo.dueDate)}
           </p>
         )}
       </div>
