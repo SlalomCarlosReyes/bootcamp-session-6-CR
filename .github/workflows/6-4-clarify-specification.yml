@@ -56,7 +56,15 @@ jobs:
             exit 1
           fi
 
-          if ! grep -q "Clarifications" "${spec_files[0]}"; then
+          clarifications_found=false
+          for spec_file in "${spec_files[@]}"; do
+            if grep -q "Clarifications" "$spec_file"; then
+              clarifications_found=true
+              break
+            fi
+          done
+
+          if [ "$clarifications_found" != "true" ]; then
             echo "Clarifications section not found in spec.md!"
             exit 1
           fi
